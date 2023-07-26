@@ -1,0 +1,47 @@
+SELECT * FROM drivers;
+SELECT forename, surname, nationality FROM drivers;
+SELECT * FROM drivers
+WHERE nationality = 'British';
+
+SELECT name, nationality FROM constructors;
+
+SELECT * FROM results;
+
+SELECT * FROM driver_standings;
+
+-- Retrieve the total number of wins for each driver
+SELECT driver_standings."driverId", forename, surname, SUM(driver_standings.wins) AS total_wins
+FROM driver_standings
+JOIN drivers ON driver_standings."driverId" = drivers."driverId"
+GROUP BY driver_standings."driverId", drivers.forename, drivers.surname
+ORDER BY total_wins DESC;
+
+-- Create the new table with the total wins for each driver
+CREATE TABLE driver_total_wins AS
+SELECT driver_standings."driverId", forename, surname, SUM(driver_standings.wins) AS total_wins
+FROM driver_standings
+JOIN drivers ON driver_standings."driverId" = drivers."driverId"
+GROUP BY driver_standings."driverId", forename, surname;
+
+SELECT * FROM driver_total_wins;
+
+SELECT * FROM constructors;
+SELECT * FROM constructor_results;
+SELECT * FROM constructor_standings;
+
+SELECT year FROM races;
+
+-- Retrieve the average points scored by each constructor in a specific year (e.g., 2021):
+SELECT constructors.name, AVG(constructor_results.points) AS average_points
+FROM constructors
+JOIN constructor_results ON constructors."constructorId" = constructor_results."constructorId"
+JOIN races ON constructor_results."raceId" = races."raceId"
+WHERE races.year = 2021
+GROUP BY constructors.name;
+
+-- Retrieve the list of races and the corresponding fastest lap times:
+SELECT name AS race_name, MIN(lap_times.time) AS fastest_lap_time
+FROM races
+JOIN lap_times ON races."raceId" = lap_times."raceId"
+WHERE lap_times."position" = 1 AND races."year" = 2021
+GROUP BY name;
